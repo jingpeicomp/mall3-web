@@ -34,7 +34,8 @@ router.beforeEach(async (to, from, next) => {
           if (settings.isNeedLogin) {
             // get user info
             // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
-            const { roles } = await userStore.getInfo()
+            await userStore.getInfo()
+            let roles = ['admin']
             accessRoutes = await permissionStore.generateRoutes(roles)
           } else {
             accessRoutes = asyncRoutes

@@ -15,8 +15,9 @@
       <!-- <LangSelect /> -->
       <el-dropdown trigger="click" size="medium">
         <div class="avatar-wrapper">
+          {{ userName }}
           <!-- <img src="https://s1.ax1x.com/2022/08/03/vZfman.png" class="user-avatar" /> -->
-          <img src="https://github.jzfai.top/file/images/nav-right-logo.gif" class="user-avatar" />
+          <!-- <img src="https://github.jzfai.top/file/images/nav-right-logo.gif" class="user-avatar" /> -->
           <CaretBottom style="width: 1em; height: 1em; margin-left: 4px" />
         </div>
         <template #dropdown>
@@ -59,6 +60,13 @@ const settings = computed(() => {
 const opened = computed(() => {
   return appStore.sidebar.opened
 })
+const userName = computed(() => {
+  let username = userStore.username
+  if (username || username.startsWith('0x')) {
+    return username.substring(0, 14);
+  }
+  return username;
+})
 const appStore = useAppStore()
 const toggleSideBar = () => {
   appStore.M_toggleSideBar()
@@ -68,8 +76,8 @@ const toggleSideBar = () => {
  * */
 const router = useRouter()
 const route = useRoute()
+const userStore = useUserStore()
 const loginOut = () => {
-  const userStore = useUserStore()
   userStore.logout().then(() => {
     ElMessage({ message: 'Logout successfully', type: 'success' })
     router.push(`/login?redirect=/`)

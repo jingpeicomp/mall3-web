@@ -52,19 +52,26 @@ export const useUserStore = defineStore('user', {
           })
       })
     },
+    set(res) {
+      return new Promise((resolve, reject) => {
+        setToken(res?.token)
+        resolve(null)
+      })
+    },
     // get user info
     getInfo() {
       return new Promise((resolve, reject) => {
         getInfoReq()
           .then((response) => {
             const { data } = response
-            if (!data || !data.roles) {
+            if (!data) {
               return reject('Verification failed, please Login again.')
             }
 
-            localStorage.setItem('roles', JSON.stringify(data.roles))
-            const { roles, name } = data
-            this.M_username(name)
+            const roles = ['admin']
+            localStorage.setItem('roles', JSON.stringify(roles))
+            const { name, pubWeb3Addr } = data
+            this.M_username(name || pubWeb3Addr)
             this.M_roles(roles)
             resolve(data)
           })

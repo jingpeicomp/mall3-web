@@ -1,7 +1,7 @@
 const setting = {
   /*page layout related*/
   //sideBar or navbar show title
-  title: 'Bik Mall3',
+  title: 'Mall3',
   /**
    * @type {boolean} true | false
    * @description Whether show the logo in sidebar

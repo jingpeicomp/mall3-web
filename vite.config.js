@@ -66,7 +66,7 @@ export default ({ command, mode }) => {
       //proxy look for https://vitejs.cn/config/#server-proxy
       proxy: {
         '/api/mall3': {
-          target: 'http://localhost:8280',
+          target: 'http://localhost:8281',
           changeOrigin: true
           // rewrite: (path) => path.replace(/^\/mall3/, '')
         }

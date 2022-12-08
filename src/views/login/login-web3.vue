@@ -1,10 +1,11 @@
 <template>
   <div class="login-container columnCC">
-    <img src="@/assets/layout/mall3.svg" :alt="settings.title" />
+    <img src="@/assets/layout/mall3.svg" alt="Mall3" />
     <el-form ref="refloginForm" class="login-form" :model="formInline" :rules="formRules">
       <div class="title-container">
         <h3 class="title text-center">{{ settings.title }}</h3>
       </div>
+      <el-divider content-position="center" border-style="dashed" class="divider">用户名登录</el-divider>
       <el-form-item prop="username" :rules="formRules.isNotNull">
         <div class="rowSC">
           <span class="svg-container">
@@ -22,15 +23,20 @@
             <svg-icon icon-class="password" />
           </span>
           <el-input :key="passwordType" ref="refPassword" v-model="formInline.password" :type="passwordType"
-            name="password" placeholder="Please input password" @keyup.enter="handleLogin" />
+            name="password" placeholder="Please input password" @keyup.enter="handleLoginPwd" />
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
         </div>
       </el-form-item>
-      <div class="tip-message">{{ tipMessage }}</div>
-      <el-button :loading="loading" type="primary" class="login-btn" size="default" @click.prevent="handleLogin">
-        Login
+      <el-button :loading="pwdloading" type="primary" class="login-btn" size="default" @click.prevent="handleLoginPwd">
+        登陆
+      </el-button>
+      <el-divider content-position="center" border-style="dashed" class="divider"
+        style="font-size: 12px;">Web3钱包登录</el-divider>
+      <el-button :loading="web3loading" type="success" class="login-btn" size="default"
+        @click.prevent="handleLoginWeb3">
+        MetaMask钱包登陆
       </el-button>
     </el-form>
   </div>
@@ -45,14 +51,12 @@ import Web3 from 'web3'
 
 let web3 = undefined;
 
-// Web3.eth.personal.sign(Web3.fromUtf8("Hello from Toptal!"), Web3.eth.coinbase, console.log);
-
 //element valid
 const formRules = useElement().formRules
 //form
 let formInline = reactive({
   username: '',
-  password: ''
+  password: '',
 })
 let state = reactive({
   otherQuery: {},
@@ -84,14 +88,14 @@ watch(
 /*
  *  login relative
  * */
-let loading = ref(false)
-let tipMessage = ref('')
+let pwdloading = ref(false)
+let web3loading = ref(false)
 
 const refloginForm = ref(null)
-let handleLogin = () => {
+let handleLoginPwd = () => {
   refloginForm.value.validate((valid) => {
     if (valid) {
-      loginReq()
+      loginReqByPwd()
     } else {
       return false
     }
@@ -100,51 +104,126 @@ let handleLogin = () => {
 
 //use the auto import from vite.config.js of AutoImport
 const router = useRouter()
-let loginReq = async () => {
-  loading.value = true
+let loginReqByPwd = () => {
+  pwdloading.value = true
   const userStore = useUserStore()
+  userStore
+    .login(formInline)
+    .then(() => {
+      ElMessage({ message: 'Login successfully', type: 'success' })
+      router.push({ path: state.redirect || '/', query: state.otherQuery })
+    })
+    .catch((res) => {
+      ElMessage({
+        message: res.msg,
+        type: 'error',
+        duration: 3 * 1000
+      })
+      useCommon()
+        .sleep(30)
+        .then(() => {
+          pwdloading.value = false
+        })
+    })
+}
+
+let handleLoginWeb3 = async () => {
+  await loginReqByWeb3()
+  web3loading.value = false
+}
+
+let loginReqByWeb3 = async () => {
+  const userStore = useUserStore()
+  web3loading.value = true
   if (!window.ethereum) {
-    window.alert('Please install MetaMask first.');
+    ElMessage({
+      message: '请先安装MetaMask钱包',
+      type: 'error',
+      duration: 5 * 1000
+    })
     return;
   }
 
   if (!web3) {
     try {
       // Request account access if needed
-      await window.ethereum.enable();
+      await window.ethereum.enable()
 
       // We don't know window.web3 version, so we use our own instance of Web3
       // with the injected provider given by MetaMask
       web3 = new Web3(window.ethereum);
     } catch (error) {
-      alert('You need to allow MetaMask.');
+      ElMessage({
+        message: 'You need to allow MetaMask.',
+        type: 'error',
+        duration: 5 * 1000
+      })
       return;
     }
   }
 
-  const coinbase = web3.eth.getCoinbase();
+  const coinbase = await web3.eth.getCoinbase();
   if (!coinbase) {
-    alert('Please activate MetaMask first.');
+    ElMessage({
+      message: 'Please activate MetaMask first.',
+      type: 'error',
+      duration: 5 * 1000
+    })
     return;
   }
 
-  const publicAddress = coinbase.toLowerCase();
-  alert(publicAddress)
+  const publicAddress = coinbase.toLowerCase()
+  let reqConfig = {
+    url: '/api/mall3/auth/nonce',
+    method: 'get',
+    data: { pubAddress: publicAddress },
+    isParams: true
+  }
+  axiosReq(reqConfig).then((resData) => {
+    let nonce = resData.data
+    if (!nonce) {
+      ElMessage({
+        message: '无法生成随机字符串',
+        type: 'error',
+        duration: 5 * 1000
+      })
+      return;
+    }
 
-  // userStore
-  //   .login(formInline)
-  //   .then(() => {
-  //     ElMessage({ message: 'Login successfully', type: 'success' })
-  //     router.push({ path: state.redirect || '/', query: state.otherQuery })
-  //   })
-  //   .catch((res) => {
-  //     tipMessage.value = res.msg
-  //     useCommon()
-  //       .sleep(30)
-  //       .then(() => {
-  //         loading.value = false
-  //       })
-  //   })
+    web3.eth.personal.sign(nonce, publicAddress, '')
+      .then((signature) => {
+        reqConfig = {
+          url: '/api/mall3/auth/login/web3',
+          method: 'post',
+          data: { pubAddress: publicAddress, signature: signature, nonce: nonce },
+        }
+        axiosReq(reqConfig)
+          .then((resData) => {
+            userStore.set(resData)
+              .then(() => {
+                try {
+                  // ElMessage({ message: 'Login successfully', type: 'success' })
+                  router.push({ path: state.redirect || '/', query: state.otherQuery })
+                }
+                catch (error) {
+                  console.log('========>', error)
+                }
+              })
+          }).catch((res) => {
+            ElMessage({
+              message: res.msg,
+              type: 'error',
+              duration: 3 * 1000
+            })
+            useCommon()
+              .sleep(30)
+              .then(() => {
+                web3loading.value = false
+              })
+          })
+      })
+
+  })
 }
 /*
  *  password show or hidden
@@ -207,7 +286,8 @@ $light_gray: #eee;
 //登录按钮
 .login-btn {
   width: 100%;
-  margin-bottom: 30px;
+  margin-top: 10px;
+  margin-bottom: 20px;
 }
 
 .show-pwd {
@@ -216,6 +296,13 @@ $light_gray: #eee;
   color: $dark_gray;
   cursor: pointer;
   text-align: center;
+}
+
+.divider {
+  font-size: 12px;
+  font-weight: 300;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 </style>
 
