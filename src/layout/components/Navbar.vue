@@ -22,17 +22,17 @@
         </div>
         <template #dropdown>
           <el-dropdown-menu>
-            <router-link to="/">
-              <el-dropdown-item>Home</el-dropdown-item>
+            <router-link to="/mall3/account/user">
+              <el-dropdown-item>我的</el-dropdown-item>
             </router-link>
-            <a target="_blank" href="http://120.77.205.216:9981/bitkernal-se/sysmall3">
-              <el-dropdown-item>Source Code</el-dropdown-item>
+            <a target="_blank" href="https://github.com/jingpeicomp/mall3-app">
+              <el-dropdown-item>后端代码</el-dropdown-item>
             </a>
-            <a target="_blank" href="http://120.77.205.216:9981/mingo.liu/docs/blob/master/mall3/README.md">
-              <el-dropdown-item>Docs</el-dropdown-item>
+            <a target="_blank" href="https://github.com/jingpeicomp/mall3-web">
+              <el-dropdown-item>前端代码</el-dropdown-item>
             </a>
             <!--<el-dropdown-item>修改密码</el-dropdown-item>-->
-            <el-dropdown-item divided @click="loginOut">login out</el-dropdown-item>
+            <el-dropdown-item divided @click="loginOut">退出</el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -42,7 +42,6 @@
 
 <script setup>
 import SizeSelect from '@/components/SizeSelect/index.vue'
-import LangSelect from '@/components/LangSelect/index.vue'
 import ScreenFull from '@/components/ScreenFull/index.vue'
 import ThemeSelect from '@/components/ThemeSelect/index.vue'
 import ScreenLock from '@/components/ScreenLock/index.vue'
@@ -62,9 +61,9 @@ const opened = computed(() => {
 })
 const userName = computed(() => {
   let username = userStore.username
-  if (username || username.startsWith('0x')) {
-    return username.substring(0, 14);
-  }
+  // if (username || username.startsWith('0x')) {
+  //   return username.substring(0, 14);
+  // }
   return username;
 })
 const appStore = useAppStore()

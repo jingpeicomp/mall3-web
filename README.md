@@ -1,7 +1,5 @@
 # Bik Mall3 Web
 
-**中文**
-
 > Bik Mall3 Web 前端项目
 
 本项目使用的技术为：vue3(setup-script)+vite3+element-plus 新一代前端框架，It's fast!

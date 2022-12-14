@@ -1,74 +1,51 @@
 <template>
-    <div class="mr-3 rowSS top-div">
-        <div class="amount-balance">Vcoin账户余额: {{ balanceAmount }}</div>
-        <el-button type="primary" @click="rechargeBtnClick">
-            <el-icon style="vertical-align: middle">
-                <FolderAdd />
-            </el-icon>
-            <span style="vertical-align: middle">充值</span>
-        </el-button>
-        <el-form ref="refsearchForm" :inline="true" class="demo-searchForm ml-2">
-            <el-form-item label-width="0px" label="" prop="state" label-position="left">
-                <el-select v-model="searchForm.state" class="widthPx-150" placeholder="支付单状态">
-                    <el-option v-for="item in stateOptions" :key="item.value" :label="item.display"
-                        :value="item.value" />
-                </el-select>
-            </el-form-item>
-        </el-form>
-        <el-button type="primary" @click="searchBtnClick">刷新</el-button>
-    </div>
-    <div class="scroll-y">
-        <!--表格和分页-->
-        <el-table id="detailElementDialog" ref="mainTable" :height="`calc(100vh - ${settings.delWindowHeight})`" border
-            :data="mainTableData">
-            <el-table-column align="center" prop="id" label="ID" width="80" />
-            <el-table-column align="center" prop="amount" label="Vcoin金额" width="100" />
-            <el-table-column align="center" label="支付单状态" width="100">
-                <template #default="{ row }">
-                    {{ formatState(row.state) }}
-                </template>
-            </el-table-column>
-            <el-table-column align="center" prop="payAmount" label="支付金额（以太币）" width="120" />
-            <el-table-column align="center" prop="paidAmount" label="实际支付金额（以太币）" width="120" />
-            <el-table-column align="center" prop="payEthPubAddr" label="付款Web3钱包账户" min-width="200" />
-            <el-table-column align="center" prop="txId" label="交易ID" min-width="200" />
-            <el-table-column align="center" prop="createTime" label="创建时间" width="150" />
-            <el-table-column align="center" prop="payTime" label="支付时间" width="150" />
-        </el-table>
-        <!--分页-->
-        <div class="block columnCC mt-2">
-            <el-pagination :current-page="pageNum" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
-                layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
-                @current-change="handleCurrentChange" />
+    <div>
+        <div class="mr-3 rowSS top-div">
+            <div class="amount-balance">Vcoin账户余额: {{ balanceAmount }}</div>
+            <el-button type="primary" @click="rechargeBtnClick">
+                <el-icon style="vertical-align: middle">
+                    <FolderAdd />
+                </el-icon>
+                <span style="vertical-align: middle">充值</span>
+            </el-button>
+            <el-form ref="refsearchForm" :inline="true" class="demo-searchForm ml-2">
+                <el-form-item label-width="0px" label="" prop="state" label-position="left">
+                    <el-select v-model="searchForm.state" class="widthPx-150" placeholder="支付单状态">
+                        <el-option v-for="item in stateOptions" :key="item.value" :label="item.display"
+                            :value="item.value" />
+                    </el-select>
+                </el-form-item>
+            </el-form>
+            <el-button type="primary" @click="searchBtnClick">刷新</el-button>
         </div>
-        <!--详情-->
-        <el-dialog v-model="detailDialog" :title="dialogTitle" width="600px" :close-on-click-modal="false">
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Name：{{ detailData.name }}</div>
+        <div class="scroll-y">
+            <!--表格和分页-->
+            <el-table id="detailElementDialog" ref="mainTable" :height="`calc(100vh - ${'250px'})`" border
+                :data="mainTableData">
+                <el-table-column align="center" prop="id" label="ID" width="80" />
+                <el-table-column align="center" prop="amount" label="充值Vcoin金额" width="100" />
+                <el-table-column align="center" label="支付单状态" width="100">
+                    <template #default="{ row }">
+                        {{ formatState(row.state) }}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" prop="payAmount" label="支付金额（以太币）" width="120" />
+                <el-table-column align="center" prop="actualPayAmount" label="实际支付金额（以太币）" width="130" />
+                <el-table-column align="center" prop="gasAmount" label="手续费（以太币）" width="130" />
+                <el-table-column align="center" prop="payEthPubAddr" label="付款Web3钱包账户" min-width="200" />
+                <el-table-column align="center" prop="txId" label="交易ID" min-width="220" />
+                <el-table-column align="center" prop="createTime" label="创建时间" width="170" />
+                <el-table-column align="center" prop="payTime" label="支付时间" width="170" />
+            </el-table>
+            <!--分页-->
+            <div class="block columnCC mt-2">
+                <el-pagination :current-page="pageNum" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize"
+                    layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange" />
             </div>
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Role Type：{{ detailData.roleType }}</div>
-            </div>
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Locked State：{{ formatLockState(detailData.lockedState) }}</div>
-            </div>
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Description：{{ detailData.description }}</div>
-            </div>
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Create Time：{{ detailData.createdTimeStr }}</div>
-            </div>
-            <div class="detail-container rowBC">
-                <div class="detail-container-item">Update Time：{{ detailData.modifiedTimeStr }}</div>
-            </div>
-            <template #footer>
-                <span class="dialog-footer">
-                    <el-button type="primary" @click="detailDialog = false">Ok</el-button>
-                </span>
-            </template>
-        </el-dialog>
-        <VcoinRechargeForm v-if="showRechargeForm" ref="refRechargeForm" @hideComp="hideRechargeComp"
-            @selectPageReq="selectPageReq" />
+            <VcoinRechargeForm v-if="showRechargeForm" ref="refRechargeForm" @hideComp="hideRechargeComp"
+                @selectPageReq="selectPageReq" />
+        </div>
     </div>
 </template>
 <script>
@@ -159,6 +136,9 @@ let selectPageReq = () => {
     }
     axiosReq(reqConfig).then((resData) => {
         mainTableData.value = resData.data.content
+        for (const item of resData.data.content) {
+            item['actualPayAmount'] = (item.paidAmount || 0) + (item.gasAmount || 0);
+        }
         total.value = resData.data?.total
     })
 }

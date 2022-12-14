@@ -48,6 +48,7 @@ const useElementExample = () => {
     /* 表单校验*/
     formRules: {
       isNotNull: [{ required: true, message: 'The field cannot be empty', trigger: 'blur' }],
+      isSelectNotNull: [{ required: true, message: 'The field cannot be empty', trigger: 'change' }],
       isNotNullSecond: [{ required: true, message: 'Cannot be empty', trigger: 'blur' }],
       mLength8: [
         { required: true, message: 'The field cannot be empty', trigger: 'blur' },

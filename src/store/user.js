@@ -19,7 +19,9 @@ export const useUserStore = defineStore('user', {
     return {
       username: '',
       avatar: '',
-      roles: []
+      brand: '',
+      brandIcon: '',
+      pubWeb3Addr: ''
     }
   },
 
@@ -32,6 +34,13 @@ export const useUserStore = defineStore('user', {
     M_roles(roles) {
       this.$patch((state) => {
         state.roles = roles
+      })
+    },
+    M_userInfo(userInfo) {
+      this.$patch((state) => {
+        state.brand = userInfo.brand
+        state.brandIcon = userInfo.brandIcon
+        state.pubWeb3Addr = userInfo.pubWeb3Addr
       })
     },
 
@@ -73,6 +82,7 @@ export const useUserStore = defineStore('user', {
             const { name, pubWeb3Addr } = data
             this.M_username(name || pubWeb3Addr)
             this.M_roles(roles)
+            this.M_userInfo(data)
             resolve(data)
           })
           .catch((error) => {

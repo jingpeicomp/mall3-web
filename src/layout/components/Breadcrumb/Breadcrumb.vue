@@ -3,19 +3,13 @@
     <!--has transition  Judging by settings.mainNeedAnimation-->
     <transition-group v-if="settings.mainNeedAnimation" name="breadcrumb">
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
-        <span v-if="item.redirect === 'noRedirect' || index === levelList.length - 1" class="no-redirect">
-          {{ item.meta?.title }}
-        </span>
-        <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
+        {{ item.meta?.title }}
       </el-breadcrumb-item>
     </transition-group>
     <!--no transition-->
     <template v-else>
       <el-breadcrumb-item v-for="(item, index) in levelList" :key="item.path">
-        <span v-if="item.redirect === 'noRedirect' || index === levelList.length - 1" class="no-redirect">
-          {{ item.meta?.title }}
-        </span>
-        <a v-else @click.prevent="handleLink(item)">{{ item.meta.title }}</a>
+        {{ item.meta?.title }}
       </el-breadcrumb-item>
     </template>
   </el-breadcrumb>
@@ -37,11 +31,11 @@ const route = useRoute()
 const getBreadcrumb = () => {
   // only show routes with meta.title
   let matched = route.matched.filter((item) => item.meta && item.meta.title)
-  const first = matched[0]
-  if (!isDashboard(first)) {
-    //it can replace the first page if not exits
-    matched = [{ path: '/dashboard', meta: { title: 'Dashboard' } }].concat(matched)
-  }
+  // const first = matched[0]
+  // if (!isDashboard(first)) {
+  //   //it can replace the first page if not exits
+  //   matched = [{ path: '/dashboard', meta: { title: 'Dashboard' } }].concat(matched)
+  // }
   levelList.value = matched.filter((item) => item.meta && item.meta.title && item.meta.breadcrumb !== false)
 }
 

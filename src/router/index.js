@@ -34,77 +34,46 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/mall3/account/vcoin'
-    // meta: { title: 'Monitor', icon: 'eye-open' },
-    // alwaysShow: true,
-    // children: [
-    //   {
-    //     path: '/monitor/dashboard',
-    //     name: 'Dashboard',
-    //     component: () => import('@/views/dashboard/index.vue'),
-    //     meta: { title: 'Dashboard' }
-    //   },
-    //   {
-    //     path: '/monitor/alarm',
-    //     name: 'Alarm',
-    //     component: () => import('@/views/mall3/alarm'),
-    //     meta: { title: 'Alarm' }
-    //   },
-    //   {
-    //     path: '/monitor/degree',
-    //     name: 'Health Degree',
-    //     component: () => import('@/views/mall3/degree'),
-    //     meta: { title: 'Health Degree' }
-    //   }
-    // ]
   },
-  // {
-  //   path: '/mall3/cfg',
-  //   component: Layout,
-  //   meta: { title: 'Configuration', icon: 'guide' },
-  //   alwaysShow: true,
-  //   children: [
-  //     {
-  //       path: 'route',
-  //       component: () => import('@/views/mall3/cfg/route'),
-  //       name: 'Route',
-  //       meta: { title: 'Route' }
-  //     },
-  //     {
-  //       path: 'table',
-  //       component: () => import('@/views/mall3/cfg/table'),
-  //       name: 'TDengine Table Meta',
-  //       meta: { title: 'TDengine Table Meta' }
-  //     },
-  //     {
-  //       path: 'sync/job',
-  //       component: () => import('@/views/mall3/job'),
-  //       name: 'Data Sync Job',
-  //       meta: { title: 'Data Sync Job' }
-  //     },
-  //     {
-  //       path: 'metric',
-  //       component: () => import('@/views/mall3/cfg/metric'),
-  //       name: 'Metric',
-  //       meta: { title: 'Metric' }
-  //     },
-  //     {
-  //       path: 'baseline',
-  //       component: () => import('@/views/mall3/cfg/baseline'),
-  //       name: 'Baseline',
-  //       meta: { title: 'Baseline' }
-  //     },
-  //     {
-  //       path: 'health',
-  //       component: () => import('@/views/mall3/cfg/health'),
-  //       name: 'Health',
-  //       meta: { title: 'Health' }
-  //     }
-  //   ]
-  // },
+  {
+    path: '/mall3/buy',
+    component: Layout,
+    meta: { title: '采购', icon: 'example' },
+    alwaysShow: true,
+    children: []
+  },
+  {
+    path: '/mall3/stock',
+    component: Layout,
+    meta: { title: '库存', icon: 'form' },
+    alwaysShow: true,
+    children: [
+      {
+        path: 'goods',
+        component: () => import('@/views/stock/goods'),
+        name: '库存管理',
+        meta: { title: '库存管理' }
+      }
+    ]
+  },
+  {
+    path: '/mall3/sell',
+    component: Layout,
+    meta: { title: '销售', icon: 'table' },
+    alwaysShow: true,
+    children: [
+      {
+        path: 'goods',
+        component: () => import('@/views/seller/goods'),
+        name: '商品',
+        meta: { title: '商品' }
+      }
+    ]
+  },
   {
     path: '/mall3/account',
     component: Layout,
-    meta: { title: 'Account', icon: 'nested' },
+    meta: { title: '账户', icon: 'user' },
     alwaysShow: true,
     children: [
       {
@@ -112,6 +81,12 @@ export const constantRoutes = [
         component: () => import('@/views/account/vcoin'),
         name: 'Vcoin',
         meta: { title: 'Vcoin' }
+      },
+      {
+        path: 'user',
+        component: () => import('@/views/account/user'),
+        name: '用户',
+        meta: { title: '用户' }
       }
     ]
   }

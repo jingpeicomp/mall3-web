@@ -222,7 +222,6 @@ let loginReqByWeb3 = async () => {
               })
           })
       })
-
   })
 }
 /*
