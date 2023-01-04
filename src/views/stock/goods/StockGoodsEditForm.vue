@@ -15,11 +15,11 @@
         </el-select>
       </el-form-item>
       <el-form-item :label="currencyTypeRef.label" prop="price" :rules="formRules.isNotNull" label-position="left">
-        <el-input-number v-model="subForm.price" :precision="currencyTypeRef.precision" :step="currencyTypeRef.step"
-          :max="currencyTypeRef.max" :min="currencyTypeRef.min" />
+        <el-input-number v-model="subForm.price" :step="currencyTypeRef.step" :precision="currencyTypeRef.precision"
+          :max="currencyTypeRef.max" :min="currencyTypeRef.min" step-strictly />
       </el-form-item>
       <el-form-item label="上架库存" prop="count" :rules="formRules.isNotNull" label-position="left">
-        <el-input-number v-model="subForm.count" precision="0" step="1" :max="subForm.stockCount" min="1" />
+        <el-input-number v-model="subForm.count" :precision="0" :step="1" :max="10" :min="1" step-strictly />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -67,7 +67,7 @@ let subForm = reactive({
   deviceType: '',
   count: '',
   currencyType: '',
-  price: '',
+  price: 0,
   saleChannel: ''
 })
 
@@ -134,7 +134,8 @@ let submitReq = () => {
     url: `/api/mall3/stock/${data.stockId}/shelve`,
     data: data,
     method: 'post',
-    bfLoading: true
+    bfLoading: true,
+    timeout: 60000
   }).then(() => {
     elMessage('商品上架成功')
     emit('selectPageReq')

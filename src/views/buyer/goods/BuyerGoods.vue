@@ -5,6 +5,9 @@
             <!--条件搜索-->
             <el-form ref="refsearchForm" :inline="true" class="demo-searchForm ml-2">
                 <el-form-item label-width="0px" label="" prop="type" label-position="left">
+                    <el-input v-model="searchForm.brand" placeholder="品牌" />
+                </el-form-item>
+                <el-form-item label-width="0px" label="" prop="type" label-position="left">
                     <el-select v-model="searchForm.deviceType" class="widthPx-150" placeholder="设备类型">
                         <el-option v-for="item in deviceTypeOptions" :key="item.value" :label="item.display"
                             :value="item.value" />
@@ -16,6 +19,12 @@
                             :value="item.value" />
                     </el-select>
                 </el-form-item>
+                <el-form-item label-width="0px" label="" prop="type" label-position="left">
+                    <el-select v-model="searchForm.saleChannel" class="widthPx-150" placeholder="销售渠道">
+                        <el-option v-for="item in saleChannelOptions" :key="item.value" :label="item.display"
+                            :value="item.value" />
+                    </el-select>
+                </el-form-item>
             </el-form>
             <!--查询按钮-->
             <el-button type="primary" @click="searchBtnClick">查询</el-button>
@@ -24,7 +33,6 @@
         <el-table id="mainTable" ref="mainTable" :height="`calc(100vh - ${settings.delWindowHeight})`" border
             :data="mainTableData">
             <el-table-column align="center" prop="id" label="Id" width="80" />
-            <el-table-column align="center" prop="stockId" label="库存ID" width="80" />
             <el-table-column align="center" prop="name" label="商品名称" min-width="140" />
             <el-table-column align="center" prop="brand" label="品牌" width="100" />
             <el-table-column align="center" prop="image" label="商品图片" min-width="120">
@@ -66,8 +74,10 @@
             <el-table-column fixed="right" align="center" label="操作" min-width="105">
                 <template #default="{ row }">
                     <el-button link size="small" type="primary" @click="itemViewBtnClick(row)">附属卡</el-button>
-                    <el-button link v-if="row.saleChannel == 2" size="small" type="primary"
+                    <el-button v-if="row.saleChannel == 2" link size="small" type="primary"
                         @click="nftBtnClick(row)">OpenSea NFT</el-button>
+                    <el-button v-if="row.saleChannel == 1" link size="small" type="primary"
+                        @click="buyBtnClick(row)">购买</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -79,17 +89,19 @@
                 @current-change="handleCurrentChange" />
         </div>
         <ViewItem v-if="showItemViewForm" ref="refItemViewForm" @hideComp="hideComp" @selectPageReq="selectPageReq" />
+        <BuyForm v-if="showBuyForm" ref="refBuyForm" @hideComp="hideBuyComp" @selectPageReq="selectPageReq" />
     </div>
 </template>
 <script>
 export default {
-    name: 'StockGoods'
+    name: 'BuyGoods'
 }
 </script>
 <script setup>
 /*1.初始化引入和实例化*/
 import settings from '@/settings'
 import ViewItem from './ViewItem.vue'
+import BuyForm from './BuyForm.vue'
 import { pinyin } from 'pinyin-pro';
 
 /*2.表格操作和查询*/
@@ -97,6 +109,9 @@ let mainTableData = ref([])
 let searchForm = reactive({
     periodType: '',
     deviceType: '',
+    saleChannel: '',
+    brand: '',
+    showSeller: false
 })
 let periodTypeOptions = [
     {
@@ -133,6 +148,10 @@ let formatDeviceType = (type) => {
     return type === 1 ? '个人(单设备)' : '家庭(4设备)';
 }
 let saleChannelOptions = [
+    {
+        value: 0,
+        display: '所有',
+    },
     {
         value: 1,
         display: 'Web2',
@@ -217,6 +236,18 @@ let nftBtnClick = (row) => {
         url = `https://testnets.opensea.io/zh-CN/collection/${row.brand.toLowerCase()}-${row.id}`;
     }
     window.open(url, '_blank')
+}
+
+let showBuyForm = ref(false)
+const refBuyForm = ref(null)
+const hideBuyComp = () => {
+    showBuyForm.value = false
+}
+let buyBtnClick = (row) => {
+    showBuyForm.value = true
+    nextTick(() => {
+        refBuyForm.value.showModal(row)
+    })
 }
 </script>
 

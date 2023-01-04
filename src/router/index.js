@@ -40,7 +40,20 @@ export const constantRoutes = [
     component: Layout,
     meta: { title: '采购', icon: 'example' },
     alwaysShow: true,
-    children: []
+    children: [
+      {
+        path: 'goods',
+        component: () => import('@/views/buyer/goods'),
+        name: '采购商品',
+        meta: { title: '采购商品' }
+      },
+      {
+        path: 'order',
+        component: () => import('@/views/buyer/order'),
+        name: '采购订单',
+        meta: { title: '采购订单' }
+      }
+    ]
   },
   {
     path: '/mall3/stock',
@@ -65,8 +78,20 @@ export const constantRoutes = [
       {
         path: 'goods',
         component: () => import('@/views/seller/goods'),
-        name: '商品',
-        meta: { title: '商品' }
+        name: '销售商品',
+        meta: { title: '销售商品' }
+      },
+      {
+        path: 'order',
+        component: () => import('@/views/seller/order'),
+        name: '销售订单',
+        meta: { title: '销售订单' }
+      },
+      {
+        path: 'recharge',
+        component: () => import('@/views/seller/recharge'),
+        name: '充值',
+        meta: { title: '充值' }
       }
     ]
   },

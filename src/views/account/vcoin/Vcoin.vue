@@ -32,8 +32,21 @@
                 <el-table-column align="center" prop="payAmount" label="支付金额（以太币）" width="120" />
                 <el-table-column align="center" prop="actualPayAmount" label="实际支付金额（以太币）" width="130" />
                 <el-table-column align="center" prop="gasAmount" label="手续费（以太币）" width="130" />
-                <el-table-column align="center" prop="payEthPubAddr" label="付款Web3钱包账户" min-width="200" />
-                <el-table-column align="center" prop="txId" label="交易ID" min-width="220" />
+                <el-table-column align="center" prop="payEthPubAddr" label="付款Web3钱包账户" min-width="200">
+                    <template #default="{ row }">
+                        <el-link :href="`https://goerli.etherscan.io/address/${row.payEthPubAddr}`" target="_blank"
+                            type="primary">{{
+                                    row.payEthPubAddr
+                            }}</el-link>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="交易ID" min-width="220">
+                    <template #default="{ row }">
+                        <el-link :href="`https://goerli.etherscan.io/tx/${row.txId}`" target="_blank" type="primary">{{
+                                row.txId
+                        }}</el-link>
+                    </template>
+                </el-table-column>
                 <el-table-column align="center" prop="createTime" label="创建时间" width="170" />
                 <el-table-column align="center" prop="payTime" label="支付时间" width="170" />
             </el-table>

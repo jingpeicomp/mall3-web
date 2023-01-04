@@ -115,7 +115,7 @@ let loginReqByPwd = () => {
     })
     .catch((res) => {
       ElMessage({
-        message: res.msg,
+        message: res.message,
         type: 'error',
         duration: 3 * 1000
       })
@@ -211,7 +211,7 @@ let loginReqByWeb3 = async () => {
               })
           }).catch((res) => {
             ElMessage({
-              message: res.msg,
+              message: res.message,
               type: 'error',
               duration: 3 * 1000
             })

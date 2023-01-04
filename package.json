@@ -37,6 +37,7 @@
     "path": "0.12.7",
     "path-to-regexp": "6.2.0",
     "pinia": "^2.0.16",
+    "pinyin-pro": "^3.13.0",
     "screenfull": "4.2.0",
     "sortablejs": "1.15.0",
     "splitpanes": "^3.1.1",

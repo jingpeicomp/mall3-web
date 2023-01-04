@@ -25,11 +25,14 @@
             <router-link to="/mall3/account/user">
               <el-dropdown-item>我的</el-dropdown-item>
             </router-link>
-            <a target="_blank" href="https://github.com/jingpeicomp/mall3-app">
+            <a target="_blank" href="https://github.com/web3-beginner/mall3-app">
               <el-dropdown-item>后端代码</el-dropdown-item>
             </a>
-            <a target="_blank" href="https://github.com/jingpeicomp/mall3-web">
+            <a target="_blank" href="https://github.com/web3-beginner/mall3-web">
               <el-dropdown-item>前端代码</el-dropdown-item>
+            </a>
+            <a target="_blank" href="https://github.com/web3-beginner/mall3-contract">
+              <el-dropdown-item>合约代码</el-dropdown-item>
             </a>
             <!--<el-dropdown-item>修改密码</el-dropdown-item>-->
             <el-dropdown-item divided @click="loginOut">退出</el-dropdown-item>

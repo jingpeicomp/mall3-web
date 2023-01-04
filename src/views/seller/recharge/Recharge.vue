@@ -5,33 +5,28 @@
             <!--条件搜索-->
             <el-form ref="refsearchForm" :inline="true" class="demo-searchForm ml-2">
                 <el-form-item label-width="0px" label="" prop="type" label-position="left">
-                    <el-select v-model="searchForm.deviceType" class="widthPx-150" placeholder="设备类型">
-                        <el-option v-for="item in deviceTypeOptions" :key="item.value" :label="item.display"
-                            :value="item.value" />
-                    </el-select>
+                    <el-input v-model="searchForm.brand" placeholder="品牌" />
                 </el-form-item>
                 <el-form-item label-width="0px" label="" prop="type" label-position="left">
-                    <el-select v-model="searchForm.periodType" class="widthPx-150" placeholder="周期类型">
-                        <el-option v-for="item in periodTypeOptions" :key="item.value" :label="item.display"
+                    <el-select v-model="searchForm.saleChannel" class="widthPx-150" placeholder="销售渠道">
+                        <el-option v-for="item in saleChannelOptions" :key="item.value" :label="item.display"
                             :value="item.value" />
                     </el-select>
                 </el-form-item>
             </el-form>
             <!--查询按钮-->
             <el-button type="primary" @click="searchBtnClick">查询</el-button>
+            <el-button type="warning" @click="addBtnClick">充值</el-button>
         </div>
         <!--表格和分页-->
         <el-table id="mainTable" ref="mainTable" :height="`calc(100vh - ${settings.delWindowHeight})`" border
             :data="mainTableData">
             <el-table-column align="center" prop="id" label="Id" width="80" />
-            <el-table-column align="center" prop="stockId" label="库存ID" width="80" />
+            <el-table-column align="center" prop="goodsItemId" label="卡号" min-width="120" />
+            <el-table-column align="center" prop="toUserId" label="充值用户ID" width="120" />
+            <el-table-column align="center" prop="goodsId" label="销售商品ID" width="120" />
             <el-table-column align="center" prop="name" label="商品名称" min-width="140" />
             <el-table-column align="center" prop="brand" label="品牌" width="100" />
-            <el-table-column align="center" prop="image" label="商品图片" min-width="120">
-                <template #default="{ row }">
-                    <el-image style="width: 60px; height: 60px" :src="row.image" />
-                </template>
-            </el-table-column>
             <el-table-column align="center" label="设备类型" width="100">
                 <template #default="{ row }">
                     {{ formatDeviceType(row.deviceType) }}
@@ -47,29 +42,7 @@
                     {{ formatSaleChannel(row.saleChannel) }}
                 </template>
             </el-table-column>
-            <el-table-column align="center" label="货币类型" width="100">
-                <template #default="{ row }">
-                    {{ formatCurrencyType(row.currencyType) }}
-                </template>
-            </el-table-column>
-            <el-table-column align="center" prop="price" label="价格" width="100" />
-            <el-table-column align="center" prop="count" label="上架库存" width="100" />
-            <el-table-column align="center" prop="contractAddress" label="智能合约地址" min-width="160">
-                <template #default="{ row }">
-                    <el-link :href="`https://goerli.etherscan.io/address/${row.contractAddress}`" target="_blank"
-                        type="primary">{{
-                                row.contractAddress
-                        }}</el-link>
-                </template>
-            </el-table-column>
-            <!--点击操作-->
-            <el-table-column fixed="right" align="center" label="操作" min-width="105">
-                <template #default="{ row }">
-                    <el-button link size="small" type="primary" @click="itemViewBtnClick(row)">附属卡</el-button>
-                    <el-button link v-if="row.saleChannel == 2" size="small" type="primary"
-                        @click="nftBtnClick(row)">OpenSea NFT</el-button>
-                </template>
-            </el-table-column>
+            <el-table-column align="center" prop="time" label="充值时间" width="170" />
         </el-table>
 
         <!--分页-->
@@ -78,25 +51,25 @@
                 layout="total, sizes, prev, pager, next, jumper" :total="total" @size-change="handleSizeChange"
                 @current-change="handleCurrentChange" />
         </div>
-        <ViewItem v-if="showItemViewForm" ref="refItemViewForm" @hideComp="hideComp" @selectPageReq="selectPageReq" />
+        <RechargeAddForm v-if="showAddForm" ref="refAddForm" @hideComp="hideComp" @selectPageReq="selectPageReq" />
     </div>
 </template>
 <script>
 export default {
-    name: 'StockGoods'
+    name: 'Recharge'
 }
 </script>
 <script setup>
 /*1.初始化引入和实例化*/
 import settings from '@/settings'
-import ViewItem from './ViewItem.vue'
-import { pinyin } from 'pinyin-pro';
+import RechargeAddForm from './RechargeAddForm.vue'
+const { elMessage } = useElement()
 
 /*2.表格操作和查询*/
 let mainTableData = ref([])
 let searchForm = reactive({
-    periodType: '',
-    deviceType: '',
+    brand: '',
+    saleChannel: ''
 })
 let periodTypeOptions = [
     {
@@ -145,19 +118,6 @@ let saleChannelOptions = [
 let formatSaleChannel = (type) => {
     return type === 1 ? 'Web2' : 'Web3';
 }
-let currencyTypeOptions = [
-    {
-        value: 1,
-        display: 'Vcoin',
-    },
-    {
-        value: 2,
-        display: '以太币',
-    }
-]
-let formatCurrencyType = (type) => {
-    return type === 1 ? 'Vcoin' : '以太币';
-}
 
 onMounted(() => {
     selectPageReq()
@@ -176,7 +136,7 @@ let selectPageReq = () => {
         }
     })
     let reqConfig = {
-        url: '/api/mall3/goods',
+        url: '/api/mall3/recharge',
         method: 'get',
         data: postBody,
         isParams: true
@@ -195,29 +155,18 @@ const searchBtnClick = () => {
 }
 
 //查询卡号
-let showItemViewForm = ref(false)
-const refItemViewForm = ref(null)
+let showAddForm = ref(false)
+const refAddForm = ref(null)
 const hideComp = () => {
-    showItemViewForm.value = false
+    showAddForm.value = false
 }
-let itemViewBtnClick = (row) => {
-    showItemViewForm.value = true
+let addBtnClick = (row) => {
+    showAddForm.value = true
     nextTick(() => {
-        refItemViewForm.value.showModal(row)
+        refAddForm.value.showModal(row)
     })
 }
 
-let nftBtnClick = (row) => {
-    let url;
-    let reg = new RegExp("[\\u4E00-\\u9FFF]+", "g")
-    if (reg.test(row.brand)) {
-        let pinyinBrand = pinyin(row.brand, { type: 'string', toneType: 'none' }).replace(' ', '-')
-        url = `https://testnets.opensea.io/zh-CN/collection/${pinyinBrand}-${row.id}`;
-    } else {
-        url = `https://testnets.opensea.io/zh-CN/collection/${row.brand.toLowerCase()}-${row.id}`;
-    }
-    window.open(url, '_blank')
-}
 </script>
 
 <style scoped lang="scss">
